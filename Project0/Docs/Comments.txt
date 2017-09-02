@@ -1,0 +1,69 @@
+Descriptive Statistics & Graphs:
+
+Categroical Variables:
+	Treatment groups: 
+		Even distriubtion of subjects amoung the treatment groups
+	Sex: fairly even distribuiton (shouldn't cause problems, can use in model)
+		More females (58.46%) enrolled then Males (41.54%)
+ 
+	Race: Lack of even distribution of race means can't make inference on race, also probably wouldn't be useful in the model
+		White: 87.69%
+		Asian: 2.31%
+		African American: 6.92%
+		Native American: 3.08% 
+
+	Smoker: Can use it in the model, better distribution
+		Yes: 37.21% 
+		No:  62.79%
+		One missing value
+		
+	TRTXSEX: Even distribution within each group, no group has major difference in distribuiton of sex
+		Group1: 42.31% Male, 57.69% Female
+		Group2: 38.46% Male, 61.54% Female
+		Group3: 42.31% Male, 57.69% Female
+		Group4: 42.31% Male, 57.69% Female
+		Group5: 42.31% Male, 57.69% Female
+
+	TRTxRACE: Should not make inferences on race, some are not represented in some of the treatment groups
+		Group1: Native American 0.00%, African American 7.69%, 
+			Asian 3.85%, White 88.46%
+		Group2: Natice American 3.85%, African American 3.85%,
+			Asian 3.85%, White 88.46%
+		Group3: Native American 3.85%, African American 19.23%,
+			Asian 0.00%, White 76.92%
+		Group4: Native American 0.00%, African American 0.00%,
+			Asian 3.85%, White 96.15%
+		Group5: Native American 7.96%, African American 3.85%,
+			Asian 0.00%, White 88.46%
+	TRTxSMOKER: Good distribuiton in each groups, can make inference on smoking status effect
+		Group1: No 57.69%, Yes 42.31%
+		Group2: No 65.38%, Yes 34.62%
+		Group3: No 69.23%, Yes 30.77%
+		Group4: No 56.00%, Yes 44.00%
+		Group5: No 65.38%, Yes 34.62% 
+
+Continous Variables:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
