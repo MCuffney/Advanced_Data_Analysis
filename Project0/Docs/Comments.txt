@@ -42,7 +42,23 @@ Categroical Variables:
 		Group4: No 56.00%, Yes 44.00%
 		Group5: No 65.38%, Yes 34.62% 
 
-Continous Variables:
+Continous Variables (General):
+	AGE: MIN: 28.572 MAX: 74.533 MEAN: 49.943 STD:10.032 [1 Missing Value]
+	ATTACHBASE: MIN: 0.895 MAX: 5.089 MEAN: 2.146 STD: 0.797 [No Missing Value]
+	ATTACH1YEAR: MIN: 0.865 MAX: 5.304 MEAN: 2.101 STD: 0.772 [27 Missing Values]
+	ATTACHDIFF: MIN: -1.048 MAX: 0.452 MEAN: -0.099 STD: 0.276
+	PDBASE: MIN: 2.263 MAX: 5.217 MEAN: 3.14 STD: 0.438 [No Missing Values]
+	PD1YEAR: MIN: 1.964 MAX: 4.891 MEAN: 2.875 STD: 0.488 [27 Missing Values]
+	PDDIFF: MIN: -0.858 MAX: 0.455 MEAN: -0.294 STD: 0.268
+
+Continous variables (by trtgroup):
+	trtgroup=1: 
+
+ 
+
+
+
+	
 
 
 
