@@ -85,3 +85,19 @@ PROC BOXPLOT DATA=Dental.Change;
 	PLOT pddiff*trtgroup;
 RUN;
 
+*Start of regression section;
+*Checking correlation to help in choosing covariates to include in model;
+PROC CORR DATA=Dental.Change PLOTS=matrix(histogram);
+RUN;
+
+*Model 1: Outcome = Attachdiff;
+PROC GLM DATA=Dental.Change;
+CLASS trtgroup;
+MODEL attachdiff = trtgroup attachbase sex age smoker;
+RUN;
+
+*Model 2: Outcome = Pddiff;
+PROC GLM DATA=Dental.Change;
+CLASS trtgroup;
+MODEL pddiff = trtgroup pdbase sex;
+RUN;

@@ -51,10 +51,18 @@ Continous Variables (General):
 	PD1YEAR: MIN: 1.964 MAX: 4.891 MEAN: 2.875 STD: 0.488 [27 Missing Values]
 	PDDIFF: MIN: -0.858 MAX: 0.455 MEAN: -0.294 STD: 0.268
 
-Continous variables (by trtgroup):
-	trtgroup=1: 
+Covariates for Model (outcome=Attachdiff):
+	trtgroup, 
+	attachbase, 
+	Sex ( moderate negative corrolation, -0.17954), 
+	age (moderate, negatice correlation -0.17458), 
+	smoker (moderate, postive correlation 0.16209)
 
- 
+Covariates for model (Outcome=pddiff):
+	Trtrgroup,
+	pdbase,
+	Sex (Moderate, negative corrolation, -0.21819),
+	
 
 
 
