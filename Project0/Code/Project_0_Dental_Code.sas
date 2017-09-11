@@ -93,11 +93,11 @@ RUN;
 *Model 1: Outcome = Attachdiff;
 PROC GLM DATA=Dental.Change;
 CLASS trtgroup;
-MODEL attachdiff = trtgroup attachbase sex age smoker;
+MODEL attachdiff = trtgroup attachbase sex age smoker / SOLUTION;
 RUN;
 
 *Model 2: Outcome = Pddiff;
 PROC GLM DATA=Dental.Change;
 CLASS trtgroup;
-MODEL pddiff = trtgroup pdbase sex;
+MODEL pddiff = trtgroup pdbase sex / SOLUTION;
 RUN;
