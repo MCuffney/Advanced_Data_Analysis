@@ -7,13 +7,13 @@
 *                                                                      *
 *Date Created: 09/02/2017                                              *
 *                                                                      *
-*Last Edit: 09/05/2017                                                 *
+*Last Edit: 09/13/2017                                                 *
 ************************************************************************;
 RUN;
 
 /* Variabel Coding;
 	Trtgroup: 1 = Placebo gel, 2 = Control (no treatment/gel), 3 = Low Concentration, 4 = Medium Concentration, 5 = High Concentration
-	Sex: 1 = Male, 2 = Female
+	Sex: 0 = Male, 1 = Female
 	Race: 1 = Native American, 2 = African American, 4 = Asian, 5 = White
 	Smoker: 1 = Yes, 0 = No */ 
 
@@ -35,6 +35,7 @@ DATA Dental.Change;
 	SET Dental.get;
 	attachdiff = attach1year - attachbase;
 	pddiff = pd1year - pdbase;
+	sex = sex - 1;
 RUN;
 
 *Check that the above data step worked;
@@ -72,6 +73,9 @@ BY trtgroup;
 RUN;
 ODS HTML CLOSE;
 ODS HTML;
+
+PROC UNIVARIATE DATA=Dental.Change PLOTS;
+RUN;
 *Graphs of Contiuos variables;
 PROC SGPLOT DATA=Dental.Change;
 	SCATTER X=attachbase Y=attach1year / GROUP=trtgroup;
@@ -87,17 +91,66 @@ RUN;
 
 *Start of regression section;
 *Checking correlation to help in choosing covariates to include in model;
-PROC CORR DATA=Dental.Change PLOTS=matrix(histogram);
+/*PROC CORR DATA=Dental.Change PLOTS=matrix(histogram);
+RUN; */ *Used incorrectly, not relevant to the final analysis;
+
+*Crude models using Attachdiff as outcome;
+PROC REG DATA=Dental.Change;
+MODEL attachdiff = sex;
 RUN;
+PROC REG DATA=Dental.Change;
+MODEL attachdiff = age;
+RUN;
+PROC REG DATA=Dental.Change;
+MODEL attachdiff = smoker;
+RUN;
+PROC REG DATA=Dental.Change;
+MODEL attachdiff = attachbase;
+RUN;
+
+*Crude models using pddiff as outcome;
+PROC REG DATA=Dental.Change;
+MODEL pddiff = sex;
+RUN;
+PROC REG DATA=Dental.Change;
+MODEL pddiff = age;
+RUN;
+PROC REG DATA=Dental.Change;
+MODEL pddiff = smoker;
+RUN;
+PROC REG DATA=Dental.Change;
+MODEL pddiff = pdbase;
+RUN;
+
 
 *Model 1: Outcome = Attachdiff;
 PROC GLM DATA=Dental.Change;
 CLASS trtgroup;
-MODEL attachdiff = trtgroup attachbase sex age smoker / SOLUTION;
+MODEL attachdiff = trtgroup attachbase / NOINT SOLUTION;
+CONTRAST 'Trtgroup 1 vs. Trtgroup 2' trtgroup  1 -1  0  0  0;
+CONTRAST 'Trtgroup 1 vs. trtgroup 3' trtgroup  1  0 -1  0  0;
+CONTRAST 'Trtgroup 1 vs. Trtgroup 4' trtgroup  1  0  0 -1  0;
+CONTRAST 'Trtgroup 1 vs. Trtgroup 5' trtgroup  1  0  0  0 -1;
+CONTRAST 'Trtgroup 2 vs. Trtgroup 3' trtgroup  0  1 -1  0  0;
+CONTRAST 'Trtgroup 2 vs. Trtgroup 4' trtgroup  0  1  0 -1  0;
+CONTRAST 'Trtgroup 2 vs. Trtgroup 5' trtgroup  0  1  0  0 -1;
+CONTRAST 'Trtgroup 3 vs. Trtgroup 4' trtgroup  0  0  1 -1  0;
+CONTRAST 'Trtgroup 3 vs. Trtgroup 5' trtgroup  0  1  1  0 -1;
+CONTRAST 'Trtgroup 4 vs. Trtgroup 5' trtgroup  0  0  0  1 -1;
 RUN;
 
 *Model 2: Outcome = Pddiff;
 PROC GLM DATA=Dental.Change;
 CLASS trtgroup;
-MODEL pddiff = trtgroup pdbase sex / SOLUTION;
+MODEL pddiff = trtgroup pdbase /*sex*/ / NOINT SOLUTION;
+CONTRAST 'Trtgroup 1 vs. Trtgroup 2' trtgroup  1 -1  0  0  0;
+CONTRAST 'Trtgroup 1 vs. trtgroup 3' trtgroup  1  0 -1  0  0;
+CONTRAST 'Trtgroup 1 vs. Trtgroup 4' trtgroup  1  0  0 -1  0;
+CONTRAST 'Trtgroup 1 vs. Trtgroup 5' trtgroup  1  0  0  0 -1;
+CONTRAST 'Trtgroup 2 vs. Trtgroup 3' trtgroup  0  1 -1  0  0;
+CONTRAST 'Trtgroup 2 vs. Trtgroup 4' trtgroup  0  1  0 -1  0;
+CONTRAST 'Trtgroup 2 vs. Trtgroup 5' trtgroup  0  1  0  0 -1;
+CONTRAST 'Trtgroup 3 vs. Trtgroup 4' trtgroup  0  0  1 -1  0;
+CONTRAST 'Trtgroup 3 vs. Trtgroup 5' trtgroup  0  1  1  0 -1;
+CONTRAST 'Trtgroup 4 vs. Trtgroup 5' trtgroup  0  0  0  1 -1;
 RUN;
