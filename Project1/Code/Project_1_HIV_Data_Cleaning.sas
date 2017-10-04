@@ -1,13 +1,15 @@
 ************************************************************************
 *Class: BIOS 6623-Advanced Data Analysis                               *
 *                                                                      *
-*Subject: Project 1 - HIV                                           *
+*Subject: Project 1 - HIV                                              *  
+*                                                                      *
+*Purpose: Data mangement & Cleaning                                                                      *
 *                                                                      *
 *Contributors: Michael Cuffney                                         *
 *                                                                      *
 *Date Created: 09/19/2017                                              *
 *                                                                      *
-*Last Edit: 09/24/2017                                                 *
+*Last Edit: 10/3/2017                                                  *
 ************************************************************************;
 RUN;
 
@@ -24,16 +26,24 @@ PROC IMPORT
 	GETNAMES=YES;
 RUN;
 
+* Standerdize missing values ((.) for numeric and ( ) for character;
+DATA HIV.Raw2;
+	SET HIV.Raw;
+	IF BMI = 999 THEN BMI = .;
+	IF Income = 9 THEN Income = .;
+	IF CESD = -1 THEN CESD = .;
+RUN;
+
 *Creates a dataset for the baseline (year 0) values;
 DATA HIV.BL;
-SET HIV.Raw;
+SET HIV.Raw2;
 IF Years > 0 THEN DELETE;
 RUN;
 
 *Creates a dataset for the varaibles values at two years, keeping only the response variables and renaming them;
 *Investigators believe that only variables at two years that is necessary is the repsonse variables;
 DATA HIV.year2;
-SET HIV.Raw;
+SET HIV.Raw2;
 IF Years > 2 OR Years <2 THEN DELETE;
 AGG_MENT_2 = AGG_MENT;
 AGG_PHYS_2 = AGG_PHYS;
@@ -56,17 +66,4 @@ LEU3N_DIFF = LEU3N_2 - LEU3N; *Postive values are good;
 RUN;
 *******END DATA Creation***************;
 
-********BEGIN DESCRIPTIVE STATISTICS*********;
-PROC SORT DATA=HIV.BLandTWO;
-BY hard_drugs;
-RUN;
-*Genral statitics;
-PROC MEANS DATA=HIV.BLandTwo MIN MEAN MAX STD NMISS N;
-BY hard_drugs;
-VAR AGG_MENT AGG_MENT_2 AGG_MENT_DIFF AGG_PHYS AGG_PHYS_2 AGG_PHYS_DIFF BMI TCHOL TRIG LDL LEU3N LEU3N_2 LEU3N_DIFF VLOAD VLOAD_2 VLOAD_DIFF AGE;
-RUN;
-
-PROC FREQ DATA=HIV.BLandTwo ;
-TABLE ADH_2 HASHV HASHF income HBP DIAB LIV34 KID FRP FP DYSLIP CESD SMOKE DKGRP HEROPIATE IDU ADH RACE EDUCBAS hivpos ART everART ART_2 everART_2 hard_drugs / MISSPRINT;
-RUN;
 
