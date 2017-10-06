@@ -9,7 +9,7 @@
 *                                                                      *
 *Date Created: 09/19/2017                                              *
 *                                                                      *
-*Last Edit: 10/4/2017                                                  *
+*Last Edit: 10/5/2017                                                  *
 ************************************************************************;
 RUN;
 
@@ -80,21 +80,83 @@ DATA HIV.Clean1;
 	LVLOAD_DIFF = LVLOAD_2-LVLOAD;
 	DROP VLOAD VLOAD_2 VLOAD_DIFF;
 	IF BMI > 70.1 THEN BMI = .;
+	IF BMI < 10.8 THEN BMI = .;
 	IF RACE = 1 THEN RACECD = 1; * NHW: RACECD = 1, OTHER: RACECD = 0;
-	ELSE RACECD = 0;
+		ELSE RACECD = 0;
 	IF DKGRP = 3 THEN Alchol = 1; * >13 Drinks: Alchol = 1, <= 13 Drinks: Alchol = 0;
-	IF DKGRP < 3 THEN Alchol = 0;
+		ELSE IF DKGRP < 3 THEN Alchol = 0;
 	IF SMOKE = 3 THEN CURSmoke = 1; * Current smoker: CURSmoke = 1, Former/Never smoke: CURSmoke = 0;
-	ELSE CURSmoke = 0;
+		ELSE CURSmoke = 0;
 	IF income = . THEN incomelev = .; * <$10,000: incomelev = 1, $10,000-$40,000: incomelev = 2, >$40,000: incomelev = 3;
-	IF income = 1 THEN incomelev = 1;
-	IF income in (2, 3, 4) THEN incomelev = 2;
-	IF income > 4 THEN incomelev = 3; 
+		ELSE IF income = 1 THEN incomelev = 1;
+		ELSE IF income in (2, 3, 4) THEN incomelev = 2;
+		ELSE incomelev = 3; 
 	IF EDUCBAS <= 3 THEN edulev = 0; * <= HS: edulev = 0, >HS: edulev = 1;
-	IF EDUCBAS > 3 THEN edulev = 0;
+		ELSE IF EDUCBAS > 3 THEN edulev = 0;
 	IF ADH = . THEN artadh = .; * ADH >95%: artadh = 1, ADH <=95%: artadh = 0;
-	IF ADH in (1,2) THEN artadh = 1; 
-	IF ADH in (3,4) THEN artadh = 0;
+		ELSE IF ADH in (1,2) THEN artadh = 1; 
+		ELSE artadh = 0;
+RUN;
+PROC SORT DATA = HIV.Clean1;
+BY income;
+RUN;
+PROC PRINT DATA = HIV.Clean1;
+VAR income incomelev;
 RUN;
 
+* Varaibels of intrest to investigator:
+	Baseline outcomes
+	Baseline Age
+	Baseline BMI
+	Racecd
+	Baseline Marijuan use
+	Baseline Alchol
+	Baseline smoking
+	Baseline income
+	Education
+	Art Adherence;
+
 * Create Seprate datasets for each outcome, removing observations missing data for outcome or independent variables;
+DATA HIV.AGGMENT (KEEP = newid AGG_MENT AGG_MENT_DIFF BMI AGE RACECD HASHV Alchol CURSmoke incomelev edulev artadh hard_drugs);
+	SET HIV.Clean1;
+	IF AGG_MENT_DIFF = . THEN DELETE;
+	IF incomelev = . THEN DELETE;
+	IF BMI = . THEN DELETE;
+RUN;
+
+DATA HIV.AGGPHYS (KEEP = newid AGG_PHYS AGG_PHYS_DIFF BMI AGE RACECD HASHV Alchol CURSmoke incomelev edulev artadh hard_drugs);
+	SET HIV.Clean1;
+	IF AGG_PHYS_DIFF = . THEN DELETE;
+	IF incomelev = . THEN DELETE;
+	IF BMI = . THEN DELETE;
+RUN;
+
+DATA HIV.LEU3N (KEEP = newid LEU3N LEU3N_DIFF BMI AGE RACECD HASHV Alchol CURSmoke incomelev edulev artadh hard_drugs);
+	SET HIV.Clean1;
+	IF LEU3N_DIFF = . THEN DELETE;
+	IF incomelev = . THEN DELETE;
+	IF BMI = . THEN DELETE;
+RUN;
+
+DATA HIV.LVLOAD (KEEP = newid LVLOAD LVLOAD_DIFF BMI AGE RACECD HASHV Alchol CURSmoke incomelev edulev artadh hard_drugs);
+	SET HIV.Clean1;
+	IF LVLOAD_DIFF = . THEN DELETE;
+	IF incomelev = . THEN DELETE;
+	IF BMI = . THEN DELETE;
+RUN;
+
+PROC CONTENTS DATA = HIV.AGGMENT;
+RUN; * Contains 64.90% (N = 464) of the subjects, lost 35.10% of the subjects;
+PROC CONTENTS DATA = HIV.AGGPHYS;
+RUN; * Contains 64.90% (N = 464) of the subjects, lost 35.10% of the subjects;
+PROC CONTENTS DATA = HIV.LEU3N;
+RUN; * Contains 63.92% (N = 457) of the subjects, lost 36.08% of the subjects;
+PROC CONTENTS DATA = HIV.LVLOAD;
+RUN; * Contains 63.92% (N = 457) of the subjects, lost 36.08% of the subjects;
+
+PROC SORT DATA = HIV.AGGMENT;
+BY incomelev;
+RUN;
+PROC PRINT DATA = HIV.AGGMENT;
+VAR incomelev;
+RUN;
