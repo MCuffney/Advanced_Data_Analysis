@@ -17,6 +17,7 @@ LIBNAME Results "C:\Repositories\bios6623-MCuffney\Project1\Docs";
 * Descriptives for Outcomes;
 PROC UNIVARIATE DATA = HIV.BLandtwo;
 VAR AGG_MENT_DIFF AGG_PHYS_DIFF VLOAD_DIFF LEU3N_DIFF;
+LABEl VLOAD_DIFF = 'Difference in Viral Load';
 HISTOGRAM;
 QQPLOT;
 RUN;
@@ -42,6 +43,7 @@ RUN;
 *Descriptive Statistics for Outcomes [Cleaned dataset];
 PROC UNIVARIATE DATA = HIV.Clean1;
 VAR AGG_MENT_DIFF AGG_PHYS_DIFF LVLOAD_DIFF LEU3N_DIFF;
+LABEL LVLOAD_DIFF = 'Difference in log10 Viral load';
 HISTOGRAM;
 QQPLOT;
 RUN;
@@ -63,6 +65,7 @@ RUN;
 	DYSLIP [312, 43.64%], CESD [21, 2.94%], HEROPIATE [38, 5.31%], ART [209, 29.23%], everArt [209, 29.23%];
 
 * TRIG, LDL, KID, DIAB, and DYSLIP are missing too much data to be used;
+
 ****** END Descriptive Statistics ******;
 
 ****** BEGIN Exploratory Analysis ******;
@@ -91,7 +94,7 @@ RUN;
 *Only LVLOAD and LVLOAD_DIFF are corelated, however: Investigator wants age in the model;
 
 ****** Expolratory analysis using finalized datasets *******;
-
+*Table One Data;
 * Exploring relationships in AGGMENT dataset (OUTCOME = AGG_MENT_DIFF);
 PROC SORT DATA = HIV.AGGMENT;
 BY hard_drugs;
@@ -177,7 +180,7 @@ BY hard_drugs;
 RUN;
 
 PROC MEANS DATA = HIV.LVLOAD MIN MEAN MEDIAN MAX STD N;
-BY hard_drugs;
+*BY hard_drugs;
 VAR LVLOAD LVLOAD_DIFF AGE BMI;
 RUN;
 
@@ -196,3 +199,5 @@ RUN;
 PROC SGSCATTER DATA = HIV.LVLOAD;
 MATRIX LVLOAD LVLOAD_DIFF AGE BMI / GROUP = hard_drugs;
 RUN; 
+
+

@@ -92,18 +92,27 @@ DATA HIV.Clean1;
 		ELSE IF income in (2, 3, 4) THEN incomelev = 2;
 		ELSE incomelev = 3; 
 	IF EDUCBAS <= 3 THEN edulev = 0; * <= HS: edulev = 0, >HS: edulev = 1;
-		ELSE IF EDUCBAS > 3 THEN edulev = 0;
+		ELSE IF EDUCBAS > 3 THEN edulev = 1;
 	IF ADH = . THEN artadh = .; * ADH >95%: artadh = 1, ADH <=95%: artadh = 0;
 		ELSE IF ADH in (1,2) THEN artadh = 1; 
 		ELSE artadh = 0;
 RUN;
 PROC SORT DATA = HIV.Clean1;
-BY income;
+BY educbas;
 RUN;
 PROC PRINT DATA = HIV.Clean1;
-VAR income incomelev;
+VAR educbas edulev;
 RUN;
 
+DATA HIV.Clean2;
+	SET HIV.Clean1;
+	IF AGG_MENT_DIFF = . THEN DELETE;
+	IF AGG_PHYS_DIFF = . THEN DELETE;
+	IF LEU3N_DIFF = . THEN DELETE;
+	IF LVLOAD_DIFF = . THEN DELETE;
+	IF incomelev = . THEN DELETE;
+	IF BMI = . THEN DELETE;
+RUN;
 * Varaibels of intrest to investigator:
 	Baseline outcomes
 	Baseline Age
