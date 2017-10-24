@@ -28,9 +28,32 @@ PROC MEANS DATA = vadata.vafinal MEAN STD NMISS NOPRINT;
 	OUTPUT OUT = varesult.means;
 RUN;
 
-PROC FREQ DATA = vadata.vafinal NOPRINT;
+PROC FREQ DATA = vadata.vafinal;
 	TABLE hospcode*asa hospcode*proced hospcode*death30;
-	OUTPUT OUT = varesult.freq;
+	*OUTPUT OUT = varesult.freq;
 RUN;
 
+* Creating the death rate for each hospital in the most recent sixmonth period;
+DATA vadata.sixmonth;
+	SET vadata.vafinal;
+	BY hospcode;
+	IF sixmonth = 39;
+RUN;
 
+PROC FREQ DATA = vadata.sixmonth;
+TABLE hospcode*death30;
+RUN;
+
+DATA vadata.patient;
+	SET vadata.sixmonth (KEEP = hospcode death30);
+	BY hospcode;
+	IF	FIRST.hospcode	= 1	THEN DO;
+		paticnt	= 0;
+		deathcnt = 0;
+	END;	
+		paticnt + 1;
+		deathcnt + death30;
+		deathpct = (deathcnt/paticnt)*100;
+
+	IF	LAST.hospcode	= 1;
+RUN;
