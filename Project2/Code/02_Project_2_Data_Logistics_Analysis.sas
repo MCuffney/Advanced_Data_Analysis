@@ -42,4 +42,8 @@ DATA vaclean.deathtable;
 	Ratio = deathObs / expdeath;
 RUN;
 
+PROC MEANS DATA = vaclean.deathtable;
+VAR deathObs;
+RUN;
+
 

@@ -3,7 +3,7 @@
 *                                                                      *
 *Subject: Project 2 - VA and Heart surgery                             *
 *                                                                      *
-*Dataset: vadata2                                                       *
+*Dataset: vadata2                                                      *
 *                                                                      *
 *Purpose: Data mangement & Cleaning                                    *
 *                                                                      *
@@ -100,4 +100,7 @@ RUN;
 * Create finalized dataset for analysis;
 DATA vaclean.final;
 	SET varaw.vaasa;
+RUN;
+
+PROC CONTENTS DATA = vaclean.final;
 RUN;
