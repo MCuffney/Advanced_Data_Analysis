@@ -15,7 +15,7 @@
 ************************************************************************;
 RUN;
 
-* Spagetti graph of subjects for each outcome;
+* Spagetti graph of subjects for each outcome [all data combined];
 PROC SGPLOT DATA=memraw.raw;
 	SERIES x=age y=logmemI / group=id;
 RUN;
