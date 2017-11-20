@@ -22,7 +22,11 @@ LIBNAME memclean "C:\Users\micha\Desktop\BIOS_6623-Advanced_Data_Analysis\Projec
 DATA memraw.raw;
 INFILE "C:\Users\micha\Desktop\BIOS_6623-Advanced_Data_Analysis\Project_3\Raw_Data\Project3Data.csv" DSD FIRSTOBS = 2;
 INPUT  id gender SES age cdr blockR animals logmemI logmemII ageonset demind;
+time = age - ageonset;
+tao = (age - ageonset + 4);
+spline = max(0,(age - ageonset + 4));
 RUN;
+
 PROC CONTENTS DATA = memraw.raw varnum;
 RUN;
 * 11 variables, 3,385 observations;

@@ -16,8 +16,9 @@
 RUN;
 
 * Analysis of logmemI outcome;
+* Look into the Type option;
 PROC MIXED DATA = memclean.logmemI;
 	CLASS id gender;
 	MODEL logmemI = age gender SES demind / SOLUTION;
-	RANDOM intercept age / subject=ID type=AR(1) g gcorr v vcorr;
+	RANDOM intercept age / subject=ID type= g gcorr v vcorr;
 RUN;

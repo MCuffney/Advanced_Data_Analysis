@@ -38,6 +38,7 @@ TABLE demind*gender;
 RUN;
 
 * Spagetti graph of subjects for each outcome [Subjects with MCI/Demintia];
+*Use SGPANEL to put multiple graphs in one plot;
 PROC SGPLOT DATA=memclean.MCI;
 	SERIES x=age y=logmemI / group=id;
 RUN;
