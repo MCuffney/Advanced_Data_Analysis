@@ -11,14 +11,14 @@
 *                                                                      *
 *Date Created: 11/15/2017                                              *
 *                                                                      *
-*Last Edit: 11/15/2017                                                 *
+*Last Edit: 11/20/2017                                                 *
 ************************************************************************;
 RUN;
 
 * Analysis of logmemI outcome;
 * Look into the Type option;
-PROC MIXED DATA = memclean.logmemI;
+PROC MIXED DATA = memclean.animals;
 	CLASS id gender;
-	MODEL logmemI = age gender SES demind / SOLUTION;
-	RANDOM intercept age / subject=ID type= g gcorr v vcorr;
+	MODEL animals = age demind age*demind spline gender SES / SOLUTION;
+	RANDOM intercept age / subject=ID type=UN g gcorr v vcorr;
 RUN;

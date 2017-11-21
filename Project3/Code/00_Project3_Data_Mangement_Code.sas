@@ -11,7 +11,7 @@
 *                                                                      *
 *Date Created: 11/06/2017                                              *
 *                                                                      *
-*Last Edit: 11/15/2017                                                 *
+*Last Edit: 11/20/2017                                                 *
 ************************************************************************;
 RUN;
 
@@ -21,15 +21,14 @@ LIBNAME memclean "C:\Users\micha\Desktop\BIOS_6623-Advanced_Data_Analysis\Projec
 * Reading in raw datafile;
 DATA memraw.raw;
 INFILE "C:\Users\micha\Desktop\BIOS_6623-Advanced_Data_Analysis\Project_3\Raw_Data\Project3Data.csv" DSD FIRSTOBS = 2;
-INPUT  id gender SES age cdr blockR animals logmemI logmemII ageonset demind;
-time = age - ageonset;
-tao = (age - ageonset + 4);
-spline = max(0,(age - ageonset + 4));
+INPUT  id gender SES age cdr blockR animals logmemI logmemII ageonset demind; 
 RUN;
-
+PROC FREQ DATA=memraw.raw NLEVELS;
+TABLE id;
+RUN;
 PROC CONTENTS DATA = memraw.raw varnum;
 RUN;
-* 11 variables, 3,385 observations;
+* 11 variables, 216 subjects, 3,385 observations;
 * Outcomes: 1)logmemI: logical memory I Story A score, 2)logmemII: logical memory II Story A score, 
 	3)Animals: The category fluency for animals score, 4)BlockR: The block design test score
 * Covariates: 1)Gender [1=Male, 2=Female], 2)SES, 3)Age: Age at visit in years, 4)CDR: Clinical Dementia Rating Scale,
@@ -47,25 +46,149 @@ RUN;
 PROC MEANS DATA=memraw.raw MIN MEAN MEDIAN MAX STD N NMISS;
 VAR SES age blockR animals logmemI logmemII ageonset;
 RUN; 
-PROC FREQ DATA=memraw.raw;
-TABLE gender cdr demind;
-RUN; 
+* SES (4 missing), BlockR (1851 missing), animals (1893 missing), logmemI (1827 missing), logmemII (1835 missing), ageonset (2055 missing);
+* For outcomes will only keep subjects with at least 3 measures of the outcome;
+
+*Check SES missing values;
+PROC MEANS DATA=memraw.raw NMISS;
+BY id;
+VAR SES;
+RUN;
+* All misssing values are for ID 374, remove this subject from dataset;
+
+*Check that ageonset missing values are just for the subjects not diagnosed with MCI;
+PROC SORT DATA = memraw.raw;
+BY demind;
+RUN;
+
+PROC MEANS DATA=memraw.raw NMISS;
+BY demind;
+VAR ageonset;
+RUN;
+* All missing ageonset are sujects without MCI diagnoeses;
 * Everything appears to be in order: No out of range values or incorrectly inputted data;
+
+* Focus on the Animals outcome;
+* Remove the subject missing SES, remove observations missing Ainmals outcome;
+DATA memraw.clean1;
+	SET memraw.raw;
+	IF ses = . THEN DELETE;
+	IF animals = . THEN DELETE;
+RUN;
+
+* Check number of meausres for each subject;
+PROC SORT DATA=memraw.clean1;
+	BY id;
+RUN;
+PROC MEANS DATA=memraw.clean1 N;
+BY id;
+VAR animals;
+RUN;
+* Subjects with less than 3 measures: 108, 112, 113, 117, 118, 133, 159, 167, 189, 236, 245, 320, 332, 337, 345,  371-389
+* Remove subjects with less than 3 meausres;
+DATA memraw.clean2;
+	SET memraw.clean1;
+	BY id;
+	IF id IN(108, 112, 113, 117, 118, 133, 159, 167, 189, 236, 245, 320, 332, 337, 345) OR id >=371 THEN DELETE;
+RUN;
+* Check meausres count;
+PROC FREQ DATA=memraw.clean2;
+table id;
+RUN;
+* All counts are >3;
+*Find minium age to use in creating new age variable;
+PROC MEANS DATA=memraw.clean2 MIN;
+VAR age;
+RUN;
+* Minium age=59;
+
+* create spline varaible, time variable, and new age variable;
+DATA memclean.clean;
+	SET memraw.clean2;
+	time = age - ageonset;
+	age2 = age - 59;
+	tao = (age - ageonset + 4); * Created to check that the spline values were created correctly;
+ 	spline = max(0,(age - ageonset + 4)); 
+RUN;
+* Check range of spline variabel (should be greater than 0;
+PROC MEANS DATA=memclean.clean MIN MAX;
+	VAR spline;
+RUN;
+
+* CHecks out;
 ********** End Data Cleaning **********;
 
 ********** Begin creating datasets for analysis *********;
-* Create baseline dataset: Used for table one statistics;
+* Create dataset for analysis;
+DATA memclean.animals;
+	SET memclean.clean;
+	DROP tao;
+RUN;
+PROC FREQ DATA=memclean.animals NLEVELS;
+	TABLE id;
+RUN;
+PROC CONTENTS DATA=memclean.animals varnum;
+RUN;
+* 14 variables, 187 subjects, 1,454 observations:
+	29 subjects removed, 1,931 observations removed;
+
+*Create Baseline dataset to use for table one;
 DATA memclean.Baseline;
-	SET memraw.raw;
-	BY ID;
-	IF FIRST.ID = 1;
+	SET memclean.animals;
+	BY id;
+	IF FIRST.id = 1;
 RUN;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/********************* Old Code ********************
 * Split the raw data into two dataset: Subjects with MCI/Demitia and Subjects without MCI/Demitia;
 DATA memclean.MCI memclean.NOMCI;
 	SET memraw.raw;
 	IF demind = 1 THEN OUTPUT memclean.MCI;
 	IF demind = 0 THEN OUTPUT memclean.NOMCI;
+	age2 = age - 55;
 RUN;
 
 * Create the four outcome varaible datasets: Will only contain subjects that have at least three measurements on the outcome;
@@ -79,13 +202,19 @@ DATA memraw.logmemI; * determine the subjects with < 3 measures of the outcome;
 	IF logmemI ^= . THEN count + 1;
 	IF LAST.ID = 1;
 	IF count >= 3 THEN DELETE; 
+	age2 = age - 55;
 	RUN;
 * 23 to be removed. ID with less than 3 measurements: 106, 138, 147, 149, 159, 167, 189, 236, 245, 320, 332, 337, 345, 371 - 389;
 DATA memclean.logmemI;
 	SET memraw.raw;
-	IF ID IN(106, 138, 147, 149, 159, 167, 189, 236, 320, 337) THEN DELETE;
+	IF ID IN(106, 138, 147, 149, 159, 167, 189, 236, 245, 320, 332, 337, 345) THEN DELETE;
 	IF ID >= 371 THEN DELETE;
+	age2 = age - 55;
 	RUN;
+PROC MEANS DATA=memclean.logmemI N NMISS;
+BY id;
+VAR logmemI;
+RUN;
 PROC CONTENTS DATA = memclean.logmemI varnum;
 RUN;
 * 11 variables, 3,306 observations: 79 observations removed;
@@ -99,7 +228,8 @@ DATA memraw.logmemII; * determine the subjects with < 3 measures of the outcome;
 		END;
 	IF logmemII ^= . THEN count + 1;
 	IF LAST.ID = 1;
-	IF count >= 3 THEN DELETE; 
+	IF count >= 3 THEN DELETE;
+	age2 = age - 55; 
 	RUN;
 * 23 subjects to be removed. ID with < 3 measurements: 106, 138, 147, 149, 159, 167, 189, 236, 245, 299, 320, 332, 337, 345, 371, 374, 375, 376
 	378, 380, 386, 388, 389;
@@ -129,6 +259,7 @@ DATA memclean.animals;
 	SET memraw.raw;
 	IF ID IN(106, 108, 112, 113, 117, 118, 133, 138, 147, 149, 159, 167, 189, 236, 245, 299, 320,
 	332, 337, 345, 371, 374, 375, 376, 378, 380, 386, 388, 389) THEN DELETE;
+	age2 = age - 55;
 RUN;
 PROC CONTENTS DATA = memclean.animals varnum;
 RUN;
@@ -151,10 +282,12 @@ DATA memclean.animals;
 	SET memraw.raw;
 	IF ID IN(106, 108, 112, 113, 117, 118, 133, 138, 147, 149, 159, 167, 189, 236, 245, 299,
 	320, 332, 337, 345, 371, 374, 375, 376, 378, 380, 386, 388, 389) THEN DELETE;
+	age2 = age - 55;
 RUN;
 PROC CONTENTS DATA = memclean.animals varnum;
 RUN;
 * 11 variables, 3,270: 115 observations removed;
+*/
 
 
 
