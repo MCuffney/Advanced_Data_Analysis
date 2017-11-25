@@ -20,15 +20,15 @@ LIBNAME memclean "C:\Users\micha\Desktop\BIOS_6623-Advanced_Data_Analysis\Projec
 * Look into the Type option;
 PROC MIXED DATA = memclean.animals;
 	CLASS id gender;
-	MODEL animals = age demind age*demind spline gender SES / SOLUTION;
+	MODEL animals = age demind age*demind spline gender SES / SOLUTION CL;
 	RANDOM intercept age / subject=ID type=UN g gcorr v vcorr;
 	ESTIMATE "Demintia Effect"
 				age 1
-				age*demind 1; * Tells how different the change is;
+				age*demind 1 / CL; * Tells how different the change is;
 	ESTIMATE "Rate of change at CHGPT"
 				age 1
 				age*demind 1
-				spline 1; * Tells the actually rate of change after the chgpt;
+				spline 1 / CL; * Tells the actually rate of change after the chgpt;
 RUN;
 * Question 1: Look at Beta associated with age;
 * Question 2: Look at first estimate statememt, secound estimate tells that actual rate of change after the chgpt;

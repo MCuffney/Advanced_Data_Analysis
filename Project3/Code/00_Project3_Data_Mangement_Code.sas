@@ -11,7 +11,7 @@
 *                                                                      *
 *Date Created: 11/06/2017                                              *
 *                                                                      *
-*Last Edit: 11/20/2017                                                 *
+*Last Edit: 11/25/2017                                                 *
 ************************************************************************;
 RUN;
 
@@ -119,10 +119,18 @@ RUN;
 ********** End Data Cleaning **********;
 
 ********** Begin creating datasets for analysis *********;
+PROC FORMAT;
+VALUE MCI
+	0 = 'NO MCI/Dementia'
+	1 = 'MCI/Dementia';
+Value Gender
+	1 = 'Male'
+	2 = 'Female';
 * Create dataset for analysis;
 DATA memclean.animals;
 	SET memclean.clean;
 	DROP tao;
+	FORMAT demind MCI.;
 RUN;
 PROC FREQ DATA=memclean.animals NLEVELS;
 	TABLE id;

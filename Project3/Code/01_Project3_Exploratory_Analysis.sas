@@ -50,7 +50,7 @@ PROC SGPANEL DATA = memclean.animals;
 	SERIES x=age y=logmemII / group=id;
 RUN;*/
 PROC SGPANEL DATA = memclean.animals;
-	PANELBY demind;
+	PANELBY demind / NOVARNAME;
 	SERIES x=age y=Animals / group=id;
 RUN;
 /*PROC SGPANEL DATA = memraw.raw;
@@ -73,7 +73,7 @@ RUN;*/
 PROC SGPLOT DATA= memclean.animals;
 	SERIES x=time y=Animals /group=id;
 	LINEPARM x=-4 Y=0 SLOPE=.; *vertical line indicates four years prior to onset;
-	XAXIS MIN=-13 MAX=0; 
+	XAXIS MIN=-13 MAX=0 VALUES=(-13 TO 0 BY 1); 
 RUN;
 /*PROC SGPLOT DATA= memclean.MCI;
 	SERIES x=time y=BlockR /group=id;
